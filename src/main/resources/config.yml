@@ -1,0 +1,13 @@
+configuration:
+  sql-use: false
+  sql-host: 'localhost:3306'
+  sql-database: 'database'
+  sql-user: 'user'
+  sql-password: 'password'
+
+  reload-message: '<green>Плагин перезапущен.'
+
+  give-message: '<green>Вы успешно выдали игроку {player} {amount} валюты.'
+
+  withdraw-successful-message: '<green>Успешно отняли у игрока валюту!'
+  withdraw-error-message: '<red>Нельзя отнять больше чем у игрока есть! Ниже нуля баланс не опустится.'
