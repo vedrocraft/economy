@@ -11,6 +11,7 @@ import ru.sema1ary.economy.service.impl.EconomyServiceImpl;
 import ru.sema1ary.vedrocraftapi.BaseCommons;
 import ru.sema1ary.vedrocraftapi.command.LiteCommandBuilder;
 import ru.sema1ary.vedrocraftapi.ormlite.ConnectionSourceUtil;
+import ru.sema1ary.vedrocraftapi.ormlite.DatabaseUtil;
 import ru.sema1ary.vedrocraftapi.service.ConfigService;
 import ru.sema1ary.vedrocraftapi.service.ServiceManager;
 import ru.sema1ary.vedrocraftapi.service.impl.ConfigServiceImpl;
@@ -24,11 +25,12 @@ public final class Economy extends JavaPlugin implements BaseCommons {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-
         ServiceManager.registerService(ConfigService.class, new ConfigServiceImpl(this));
 
-        initConnectionSource();
+        DatabaseUtil.initConnectionSource(
+                this,
+                getService(ConfigService.class),
+                EconomyUser.class);
 
         ServiceManager.registerService(EconomyService.class, new EconomyServiceImpl(
                 getDao(EconomyUser.class)
@@ -55,25 +57,5 @@ public final class Economy extends JavaPlugin implements BaseCommons {
     @Override
     public void onDisable() {
         ConnectionSourceUtil.closeConnection(true);
-    }
-
-    @SneakyThrows
-    private void initConnectionSource() {
-        if(getService(ConfigService.class).get("sql-use")) {
-            ConnectionSourceUtil.connectSQL(
-                    getService(ConfigService.class).get("sql-host"),
-                    getService(ConfigService.class).get("sql-database"),
-                    getService(ConfigService.class).get("sql-user"),
-                    getService(ConfigService.class).get("sql-password"),
-                    EconomyUser.class);
-            return;
-        }
-
-        Path databaseFilePath = Paths.get("plugins/economy/database.sqlite");
-        if(!Files.exists(databaseFilePath) && !databaseFilePath.toFile().createNewFile()) {
-            return;
-        }
-
-        ConnectionSourceUtil.connectNoSQLDatabase(databaseFilePath.toString(), EconomyUser.class);
     }
 }
